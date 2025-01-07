@@ -42,14 +42,14 @@ INSERT INTO LoanPeriodExtraMonthInterests (ExtraMonths, ExtraMonthInterestRate)
 VALUES (12, 0.15);
 
 
-INSERT INTO Clients (FullName, Age)
+INSERT INTO Clients (Id, FullName, Age)
 VALUES
-    ('John Doe', 15),
-        ('John Doe', 25),
-       ('Jane Doe', 35),
-       ('Alice Doe', 45),
-       ('Bob Doe', 55),
-       ('Charlie Doe', 65);
+    ('069C62F2-005B-4974-96A4-319E6E641BD4', 'John Doe', 21),
+    ('FBD58F33-8C8D-4F61-BB91-4922CC4957DD', 'John Doe', 25),
+    ('028C1CC1-DB2A-4464-9694-5517717E097C', 'Jane Doe', 35),
+    ('94F94586-2B49-4DAA-850D-BAE017133457', 'Alice Doe', 45),
+    ('10048726-5E8C-4A28-B13D-E44990E14AFF', 'Bob Doe', 55),
+    ('2E8E8379-2F06-4F33-BBA0-E9675BF22574', 'Charlie Doe', 65);
 
 INSERT Into PrimeInterest (InterestRate, IsActive)
 VALUES (1.5, 1);

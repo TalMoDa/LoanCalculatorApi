@@ -1,6 +1,9 @@
-﻿namespace LoanCalculatorAPI.Data.Repositories.Interfaces;
+﻿using LoanCalculatorAPI.Data.Entities.EF;
 
-public interface ILoanAgeCalculationRepository
+namespace LoanCalculatorAPI.Data.Repositories.Interfaces;
+
+public interface ILoanAgeCalculationRepository : IBaseRepository<LoanAgeCalculation>
 {
-    
+    Task<List<LoanAgeCalculation>> GetLoanAgeCalculationByAgeAndLoanAmount(int age, decimal loanAmount,
+        CancellationToken cancellationToken = default);
 }

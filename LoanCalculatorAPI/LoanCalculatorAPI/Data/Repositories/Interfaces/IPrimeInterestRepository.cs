@@ -1,6 +1,8 @@
-﻿namespace LoanCalculatorAPI.Data.Repositories.Interfaces;
+﻿using LoanCalculatorAPI.Data.Entities.EF;
 
-public interface IPrimeInterestRepository
+namespace LoanCalculatorAPI.Data.Repositories.Interfaces;
+
+public interface IPrimeInterestRepository : IBaseRepository<PrimeInterest>
 {
-    
+    Task<PrimeInterest?> GetActivePrimeInterestAsync(CancellationToken cancellationToken = default);
 }

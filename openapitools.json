@@ -3,34 +3,25 @@
   "generator-cli": {
     "version": "6.4.0",
     "generators": {
-      "angular": {
+      "LoanCalculatorAngularGenerator": {
         "generatorName": "typescript-angular",
-        "output": "#{cwd}/output/angular/open-api",
-        "glob": "education-orders-approval.yaml",
+        "output": "#{cwd}/output/angular/LoanCalculatorApi",
+        "glob": "LoanCalculatorApi.yaml",
         "additionalProperties": {
           "supportsES6": true
         }
       },
-      "aspnetcore": {
+      "LoanCalculatorDotNetGenerator": {
         "generatorName": "aspnetcore",
-        "output": "#{cwd}/output/aspnetcore",
-        "glob": "education-orders-approval.yaml",
+        "output": "#{cwd}/output/dotnet/LoanCalculatorApi",
+        "glob": "LoanCalculatorApi.yaml",
         "additionalProperties": {
-          "packageName": "EducationOrdersApprovalClient",
-          "packageTitle": "EducationOrdersApprovalClient",
-          "packageVersion": "1.6.0",
-          "aspnetCoreVersion": "5.0",
-          "buildTarget": "program",
-          "generateBody": true,
-          "newtonsoftVersion": "13.0.1",
-          "nullableReferenceTypes": true,
+          "packageName": "LoanCalculatorApi",
+          "packageTitle": "LoanCalculatorApi",
           "operationIsAsync": true,
           "operationResultTask": true,
-          "swashbuckleVersion": "5.0.0",
-          "useDefaultRouting": true,
-          "useFrameworkReference": true,
-          "useNewtonsoft": true,
-          "useSwashbuckle": true
+          "packageVersion": "1.0.0",
+          "aspnetCoreVersion": "6.0"
         }
       }
     }

@@ -1,5 +1,3 @@
 ### GET request to example server
-GET https://examples.http-client.intellij.net/get
-    ?generated-in=JetBrains Rider
-
-###
+// GET LOAN FOR CLIENT wirh age of 21 and loan amount of 4500 for 13 months period
+GET https://localhost:5001/finance/loan?ClientId=069C62F2-005B-4974-96A4-319E6E641BD4&LoanAmount=4500&LoanPeriodInMonths=13
