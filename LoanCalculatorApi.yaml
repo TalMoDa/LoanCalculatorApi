@@ -1,0 +1,1876 @@
+openapi: 3.0.1
+info:
+  title: Education Orders Approval Client API
+  description: This API is used to approve or reject education orders for customers and suppliers.
+  version: 1.0.0
+tags:
+  - name: page
+  - name: customer
+  - name: supplier
+
+paths:
+  /page/data:
+    get:
+      tags:
+        - page
+      operationId: GetPageData
+      description: Get page data
+      parameters:
+        - name: token
+          in: query
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PageResponse'
+
+  /customer/down/payment/invoice:
+    get:
+      tags:
+        - customer
+      operationId: GetTripDownPaymentInvoice
+      description: Get down payment invoice for trip
+      parameters:
+        - name: token
+          in: query
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                type: string
+                format: binary
+
+  /customer/approval:
+    post:
+      tags:
+        - customer
+      operationId: CustomerApproval
+      description: Update customer approval in trip
+      parameters:
+        - name: token
+          in: query
+          required: true
+          schema:
+            type: string            
+        - name: teacherName
+          in: query
+          required: true
+          schema:
+            type: string
+        - name: teacherId
+          in: query
+          required: true
+          schema:
+            type: integer
+        - name: teacherRole
+          in: query
+          required: true
+          schema:
+            type: string
+        - name: teacherSignatureDate
+          in: query
+          required: true
+          schema:
+            type: string
+            format: date-time
+        - name: referenceNumber
+          in: query
+          required: false
+          schema:
+            type: string
+        - name: paymentDate
+          in: query
+          required: false
+          schema:
+            type: string
+            format: date-time
+        - name: paymentType
+          in: query
+          required: false
+          schema:
+            type: integer
+        - name: subscribeGeneralKklEmail
+          in: query
+          required: false
+          schema:
+            type: boolean
+        - name: subscribeEducationKklEmail
+          in: query
+          required: false
+          schema:
+            type: boolean    
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:     
+                file:
+                  type: string
+                  format: binary
+      responses:
+        '200':
+          description: successful operation
+  
+  /supplier/approval:
+    put:
+      tags:
+        - supplier
+      operationId: SupplierApproval
+      description: Update supplier approval in order
+      parameters:
+        - name: token
+          in: query
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SupplierApproval'
+      responses:
+        '200':
+          description: successful operation
+
+components:
+  schemas:
+    
+    PageResponse:
+      type: object
+      properties:
+        pageType:
+          $ref: '#/components/schemas/EducationPageType'
+        pageData:
+          type: object
+    
+    
+    EducationPageType:
+      type: integer
+      enum: [ 1, 2, 3, 4 ]
+      x-enum-varnames: [ SupplierApproval, CustomerApproval, GuideScheduleInfo, CustomerFeedback ]
+        
+    CustomerApproval:
+      type: object
+      properties:
+        teacherName:
+          type: string
+        teacherId:
+          type: integer
+        teacherRole:
+          type: string
+        teacherSignatureDate:
+          type: string
+          format: date-time
+        referenceNumber:
+          type: string
+          nullable: true
+        paymentDate:
+          type: string
+          format: date-time
+          nullable: true
+        paymentType:
+          type: integer
+          nullable: true
+        subscribeGeneralKklEmail:
+          type: boolean
+        subscribeEducationKklEmail:
+          type: boolean
+    
+    SupplierApproval:
+      type: object
+      properties:
+        isApprove:
+          type: boolean
+        notApproveReason:
+          type: string
+        approvedByName:
+          type: string
+        approvedById:
+          type: integer
+    
+    CustomerFeedbackContent:
+      type: object
+      properties:
+        trip:
+          $ref: '#/components/schemas/FullTrip'
+        customerFeedback:
+          $ref: '#/components/schemas/CustomerFeedback'
+    
+    SupplierApprovalContent:
+      type: object
+      properties:
+        trip:
+          $ref: '#/components/schemas/FullTrip'
+        order:
+          type: array
+          items:
+            $ref: '#/components/schemas/OrderEvent'
+    
+    GuideScheduleContent:
+      type: object
+      properties:
+        trip:
+          $ref: '#/components/schemas/FullTrip'
+        order:
+          type: array
+          items:
+            $ref: '#/components/schemas/OrderEvent'
+        guidesSchedule:
+          type: array
+          items:
+            $ref: '#/components/schemas/GuideCalendar'
+            
+    GuideCalendar:
+      properties:
+        guide:
+          $ref: '#/components/schemas/Guide'
+        schedules:
+          type: array
+          items:
+            $ref: '#/components/schemas/FullGuideGuideSchedule'
+        absenceDays:
+          type: array
+          items:
+            $ref: '#/components/schemas/GuideCalendarAbsenceDay'
+        notAvailableDays:
+          type: array
+          items:
+            type: string
+            format: date 
+    
+    Guide:
+      type: object
+      properties:
+        idNumber:
+          type: string
+          description: The national ID number of the guide
+          example: 123456789
+        salesForceDetails:
+          $ref: '#/components/schemas/SalesForceDetails'
+        firstName:
+          type: string
+          description: The first name of the guide
+          example: John
+        lastName:
+          type: string
+          description: The last name of the guide
+          example: Doe
+        englishFullName:
+          type: string
+          example: benilook
+        address:
+          type: string
+        isHaveDrivingLicense:
+          type: boolean
+          nullable: true
+        gender:
+          $ref: '#/components/schemas/Gender'
+        cellPhone:
+          type: string
+          description: The cell phone number of the guide
+          example: 541234567
+        email:
+          type: string
+          format: email
+          description: The email address of the guide
+          example: kkl@kkl.org.il
+        centerFields:
+          type: array
+          items:
+            $ref: '#/components/schemas/SelectOption'
+        guideType:
+          type: string
+          example: תו תקן,מורה דרך,מורה דרך+תו תקן,בת שירות, מדריך ללא הסמכה
+        guidesLicense:
+          type: array
+          items:
+            $ref: '#/components/schemas/GuidesLicense'
+        guideLanguages:
+          type: array
+          items:
+            $ref: '#/components/schemas/GuideLanguage'
+        qualifiedAreas:
+          type: array
+          items:
+            $ref: '#/components/schemas/SelectOption'
+        certificates:
+          type: array
+          items:
+            $ref: '#/components/schemas/Certificate'
+        averageFeedBackRating:
+          type: integer
+          description: The average feedback rating of the guide
+        numberOfTrips:
+          type: integer
+          description: The number of trips the guide has done so far
+        comments:
+          type: string
+          
+    Certificate:
+      type: object
+      properties:
+        certificateType:
+          $ref: '#/components/schemas/CertificateType'
+        issueDate:
+          type: string
+          format: date
+          description: The date the certificate was issued
+        expirationDate:
+          type: string
+          format: date
+          description: The date the certificate expires
+        instructor:
+          type: string
+          description: The UserID of the issuer of the certificate
+          
+    CertificateType:
+      properties:
+        id:
+          type: integer
+          description: The ID of the certificate type
+        name:
+          type: string
+          description: The name of the certificate type
+        numberOfYearsValid:
+          type: number
+          format: double
+          description: The number of years the certificate is valid      
+    GuidesLicenseType:
+      type: string
+      description: The type of the license
+      enum:
+        - tourGuide
+        - StandardMark
+      x-enumeration-extension:
+        tourGuide: מורה דרך
+        StandardMark: תו תקן      
+        
+    GuidesLicense:
+      type: object
+      properties:
+        licenseType:
+          $ref: '#/components/schemas/GuidesLicenseType'
+        licenseNumber:
+          type: string
+          description: The license number
+        expirationDate:
+          type: string
+          format: date
+          description: The date the license expires
+        licenseImageUrl:
+          type: array
+          items:
+            type: string
+            format: uri
+            description: The URL of the license image  
+            
+    SelectOption:
+      discriminator:
+        propertyName: selectOption
+      type: object
+      properties:
+        value:
+          type: integer
+          example: 1
+        label:
+          type: string
+          example: tt      
+          
+    GuideLanguage:
+      type: object
+      properties:
+        language:
+          $ref: '#/components/schemas/SelectOption'
+        isNative:
+          type: boolean
+          description: Indicates if the guide is a native speaker of the language
+          
+    SalesForceDetails:
+      type: object
+      properties:
+        entityId:
+          type: string
+        baseUrl:
+          type: string
+        lastModifiedUserName:
+          type: string
+        lastModifiedDate:
+          type: string
+          format: date
+          nullable: true
+          
+    Gender:
+      type: string
+      enum:
+        - male
+        - female      
+          
+    FullGuideGuideSchedule:
+      allOf:
+        - $ref: '#/components/schemas/GuideSchedule'
+      type: object
+      properties:
+        trip:
+          $ref: '#/components/schemas/TripBase'
+    
+    TripBase:
+      discriminator:
+        propertyName: tripBase
+      type: object
+      properties:
+        trip:
+          $ref: '#/components/schemas/SelectOption'
+        dates:
+          $ref: '#/components/schemas/DatesRange'
+        status:
+          $ref: '#/components/schemas/Status'
+        marketer:
+          $ref: '#/components/schemas/Marketer'
+        participants:
+          $ref: '#/components/schemas/TripParticipants'
+        centerField:
+          $ref: '#/components/schemas/SelectOption'
+        customer:
+          $ref: '#/components/schemas/SelectOption'
+        isInsideCenterField:
+          type: boolean
+          nullable: true
+        centerFieldStatus:
+          $ref: '#/components/schemas/Status'
+    
+    TripParticipants:
+      type: object
+      properties:
+        numAdultAndYoung:
+          type: integer
+        numGuides:
+          type: integer
+        numDrivers:
+          type: integer
+        numBabies:
+          type: integer
+        numEscort:
+          type: integer
+        totalParticipants:
+          type: integer
+          
+    Marketer:
+      type: object
+      properties:
+        id:
+          type: string
+        fullName:
+          type: string
+        phoneNumber:
+          type: string
+          nullable: true
+        email:
+          type: string
+          nullable: true
+          
+    DatesRange:
+      type: object
+      properties:
+        start:
+          type: string
+          format: date-time
+          nullable: true
+          example: '2022-08-13'
+        end:
+          type: string
+          format: date-time
+          nullable: true
+          example: '2022-08-13'
+          
+    GuideSchedule:
+      discriminator:
+        propertyName: guideSchedule
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: The ID of the schedule
+          nullable: true
+        idNumber:
+          type: string
+          description: The national ID number of the guide
+          example: 123456789
+        supplierId:
+          type: integer
+          nullable: true
+        assignmentDenialReason:
+          type: string
+          description: The reason the guide was denied the assignment
+        date:
+          type: string
+          format: date
+          description: The start time the guide is assigned to the group
+        status:
+          $ref: '#/components/schemas/SelectOption'
+        isInCharge:
+          type: boolean
+          description: Indicates if the guide is in charge of the group
+          
+    GuideCalendarAbsenceDay:
+      type: object
+      properties:
+        absenceId:
+          type: string
+          format: uuid
+        day:
+          type: string
+          format: date
+        reasonComment:
+          type: string
+        reasonType:
+          $ref: '#/components/schemas/SelectOption'      
+          
+    CustomerFeedback:
+      type: object
+      properties:
+        guidesFeedback:
+          type: array
+          items:
+            $ref: '#/components/schemas/GuideFeedback'
+        contactWithMarketingUnit:
+          type: integer
+          nullable: true
+        trainingLevel:
+          type: integer
+          nullable: true
+        kklReferenceValue:
+          type: integer
+          nullable: true
+        performanceGuide:
+          type: integer
+          nullable: true
+        referenceEnvironmentValues:
+          type: integer
+          nullable: true
+        usingTrainingAids:
+          type: integer
+          nullable: true
+        centerFieldPerformance:
+          type: integer
+          nullable: true
+        cleanlinessAndMaintenance:
+          type: integer
+          nullable: true
+        foodQuality:
+          type: integer
+          nullable: true
+        levelOfBusDrivers:
+          type: integer
+          nullable: true
+        levelParamedicsGuards:
+          type: integer
+          nullable: true
+        willRecommend:
+          type: integer
+          nullable: true
+        feedbackScore:
+          type: integer
+          nullable: true
+        comments:
+          type: string
+          nullable: true
+        filledByName:
+          type: string
+          nullable: true
+        filledByRole:
+          type: string
+          nullable: true
+        filledByMobile:
+          type: string
+          nullable: true
+        filledDate:
+          type: string
+          format: date-time
+          nullable: true
+    
+    GuideFeedback:
+      type: object
+      properties:
+        score:
+          type: integer
+          nullable: true
+        comments:
+          type: string
+          nullable: true
+        guide:
+          $ref: '#/components/schemas/Guide'
+    
+    FullTrip:
+      type: object
+      properties:
+        trip:
+          $ref: '#/components/schemas/TripInfo'
+        customerTrips:
+          type: array
+          items:
+            $ref: '#/components/schemas/TripBase'
+        orders:
+          type: array
+          items:
+            $ref: '#/components/schemas/OrderEvent'
+        activities:
+          type: array
+          items:
+            $ref: '#/components/schemas/TripActivity'
+    
+    TripActivity:
+      type: object
+      properties:
+        activityId:
+          type: integer
+          description: the unique activity Id
+          example: 1
+          nullable: true
+        comment:
+          type: string
+          description: the comment of the activity
+          example: הערה בונה
+          nullable: true
+        subItemId:
+          type: integer
+          nullable: true
+          example: 221
+        activityName:
+          type: string
+          example: חינוך
+        tripActivityIdentity:
+          type: integer
+          description: refers to indentity record on trip activities table in data base
+          example: 56
+          nullable: true
+        date:
+          type: string
+          format: date-time
+          example: '2021-11-12T00:00:00'
+        description:
+          type: string
+          example: students education
+        fromHour:
+          type: string
+          format: date-time
+          example: '2021-11-12T10:00:00'
+        tillHour:
+          type: string
+          format: date-time
+          example: '2021-11-12T12:00:00'
+        itemTime:
+          $ref: '#/components/schemas/Time'
+        tripId:
+          type: integer
+          example: 2
+        region:
+          $ref: '#/components/schemas/SelectOption'
+        site:
+          $ref: '#/components/schemas/Site'
+        itemId:
+          type: integer
+          nullable: true
+        activityUrl:
+          type: string
+          nullable: true
+          
+    Site:
+      type: object
+      properties:
+        id:
+          type: integer
+          example: 1
+        name:
+          type: string
+          example: אגם החולה
+        address:
+          type: string
+          example: אגם החולה
+        webSite:
+          type: string
+        supplierCode:
+          type: integer
+          nullable: true
+          description: default supplier for order site
+        contact:
+          $ref: '#/components/schemas/Person'
+    
+    Person:
+      type: object
+      properties:
+        Name:
+          type: string
+        Phone:
+          type: string
+        Tz:
+          type: string
+        Email:
+          type: string
+          
+    Time:
+      type: object
+      properties:
+        hours:
+          type: integer
+          example: 10
+          nullable: true
+        minutes:
+          type: integer
+          example: 30
+          nullable: true     
+    
+    FieldForestCenter:
+      type: object
+      properties:
+        id:
+          title: FieldForestCenter ID
+          type: integer
+          nullable: true
+          description: FieldForestCenter unique ID
+          example: 101
+        name:
+          title: FieldForestCenter Name
+          type: string
+          description: Field & Forest Center name
+          example: נס הרים
+        iconPath:
+          title: icon
+          type: string
+          example: href...
+        diningRoomNotAvaliableFrom:
+          type: string
+          format: datetime
+        diningRoomNotAvaliableTill:
+          type: string
+          format: datetime
+          nullable: true
+        chevelCode:
+          type: integer
+          example: 1
+        linkSite:
+          type: string
+          description: gg
+        isActive:
+          type: boolean
+          nullable: true
+          example: true
+        managerName:
+          type: string
+          nullable: true
+        managerMobile:
+          type: string
+          nullable: true
+          
+    ActivityType:
+      required:
+        - id
+        - name
+      type: object
+      properties:
+        id:
+          type: integer
+          example: 8
+        name:
+          type: string
+          example: education
+        attributeId:
+          type: integer
+          nullable: true
+          example: 6
+        isCustomerSignature:
+          type: integer
+          nullable: true
+          example: 2
+        isOnDay:
+          type: integer
+          nullable: true
+          example: 2
+          
+    AgeGroup:
+      type: object
+      allOf:
+        - $ref: '#/components/schemas/SelectOption'
+    
+    TripAttribute:
+      type: object
+      properties:
+        id:
+          type: integer
+          example: 2
+        name:
+          type: string
+          example: פורמלי
+        budgetId:
+          type: integer
+          nullable: true
+          example: 5
+        budgetName:
+          type: string
+          example: education budget
+        subsidization1To25:
+          type: integer
+          description: subsidization 1 to 25 ratio
+          nullable: true
+          example: 4
+        autoCustomerId:
+          type: integer
+          nullable: true
+          example: 72
+        isSkipDmeyKdima:
+          type: boolean
+          nullable: true
+          description: Check if the property is set as no advance fee
+          example: false
+          
+    GroupGender:
+      type: object
+      allOf:
+        - $ref: '#/components/schemas/SelectOption'
+          
+    Area:
+      type: object
+      properties:
+        id:
+          type: integer
+          example: 7
+        name:
+          type: string
+          example: desert
+        regionId:
+          type: integer
+          nullable: true
+          example: 5
+          
+    City:
+      type: object
+      allOf:
+        - $ref: '#/components/schemas/SelectOption'
+          
+    Budget:
+      type: object
+      properties:
+        desc:
+          type: string
+          example: education budget
+        budgeting:
+          type: number
+          nullable: true
+        kklAmount:
+          type: integer
+          nullable: true
+          example: 2000
+        customerAmount:
+          type: integer
+          nullable: true
+          example: 1000
+        type:
+          type: integer
+          nullable: true
+          example: 4
+        isByCity:
+          type: integer
+          nullable: true
+        cities:
+          type: array
+          nullable: true
+          items:
+            $ref: '#/components/schemas/City'
+        cityId:
+          type: integer
+          nullable: true
+          example: 4
+        execution:
+          type: integer
+          nullable: true
+          example: 5
+        balanceFin:
+          type: number
+          nullable: true
+          example: 1
+        isNeedCalculate:
+          type: integer
+          nullable: true
+          example: 2
+        incomeId:
+          type: integer
+          example: 6
+        incomeName:
+          type: string
+          example: Hospitality
+        expensesId:
+          type: integer
+          example: 3
+        expensesName:
+          type: string
+          example: economy
+        subBudgetIncomeList:
+          type: array
+          items:
+            $ref: '#/components/schemas/SubBudget'
+        subBudgetExpenseList:
+          type: array
+          items:
+            $ref: '#/components/schemas/SubBudget'
+            
+    SubBudget:
+      type: object
+      allOf:
+        - $ref: '#/components/schemas/SelectOption'    
+    
+    BaseCustomer:
+      required:
+        - id
+        - name
+      type: object
+      discriminator:
+        propertyName: baseCustomer
+      properties:
+        id:
+          type: integer
+          example: 50
+        name:
+          type: string
+          example: סמינר הקיבוצים
+        address:
+          type: string
+          example: לביא
+        cityId:
+          type: integer
+          nullable: true
+          example: 12
+        cityName:
+          type: string
+          example: רמת השרון
+        lastName:
+          type: string
+          example: kkl
+        contactName:
+          type: string
+          example: דן
+        contactMobile:
+          type: string
+          example: '613566756'
+        contactEmail:
+          type: string
+          example: test@gmail.com
+        typeCode:
+          type: integer
+          nullable: true
+        typeCodeName:
+          type: string
+          nullable: true
+        SectorId:
+          type: integer
+          nullable: true
+        SectorName:
+          type: string
+          nullable: true
+        noPayment:
+          type: integer
+          nullable: true
+          description: Is the customer defined as not need to pay
+        identificationNumber:
+          type: string
+          description: Represents the identification number of the customer, Refers to id_num field in the customers table
+        institutionalCustomerType:
+          type: integer
+          nullable: true
+          description: Represents the ID type of the institutional customer, Refers to id_code field in the customers table
+          
+    Country:
+      type: object
+      allOf:
+        - $ref: '#/components/schemas/SelectOption'
+          
+    Language:
+      type: object
+      allOf:
+        - $ref: '#/components/schemas/SelectOption'    
+          
+    MainActivity:
+      allOf:
+        - $ref: '#/components/schemas/SelectOption'
+          
+    TripInfo:
+      required:
+        - tripDescription
+        - tripStart
+        - tripEnding
+        - centerField
+        - activity
+        - ageGroup
+        - attribute
+        - customer
+        - contactName
+        - contactPhone
+        - contactEmail
+        - numAdultAndYoung
+        - departmentId
+        - insideCenterFieldId
+      type: object
+      properties:
+        id:
+          type: integer
+          nullable: true
+          example: 88887777
+        tripDescription:
+          type: string
+          example: school education
+        tripStart:
+          type: string
+          format: date-time
+        tripEnding:
+          type: string
+          format: date-time
+        parentGroupId:
+          type: integer
+          nullable: true
+        centerField:
+          $ref: '#/components/schemas/FieldForestCenter'
+        activity:
+          $ref: '#/components/schemas/ActivityType'
+        ageGroup:
+          $ref: '#/components/schemas/AgeGroup'
+        attribute:
+          $ref: '#/components/schemas/TripAttribute'
+        areaTrip:
+          $ref: '#/components/schemas/Area'
+        budget:
+          $ref: '#/components/schemas/Budget'
+        customer:
+          $ref: '#/components/schemas/BaseCustomer'
+        groupGender:
+          $ref: '#/components/schemas/GroupGender'
+        kklWorker:
+          $ref: '#/components/schemas/KKLWorker'
+        payerCustomer:
+          $ref: '#/components/schemas/BaseCustomer'
+        commentManager:
+          type: string
+          example: checked well
+        contactName:
+          type: string
+          example: dan
+        contactPhone:
+          type: string
+          example: '38347922'
+        contactEmail:
+          type: string
+          example: test@gmail.com
+        confirm:
+          type: string
+          example: confirmed
+        customerSignatureDate:
+          type: string
+          format: date-time
+          nullable: true
+        confirmBy:
+          type: string
+          example: dan
+        country:
+          $ref: '#/components/schemas/Country'
+        departmentId:
+          type: integer
+          description: 1= Israel, 8= Abroad
+          example: 1
+        generateTime:
+          type: string
+          description: Trip creation date
+          format: date-time
+        language:
+          $ref: '#/components/schemas/Language'
+        numAccompanied:
+          type: integer
+          example: 5
+        numAdultAndYoung:
+          type: integer
+          example: 8
+        numAccompaniedAndGuide:
+          type: integer
+          example: 9
+        numGuides:
+          type: integer
+          example: 5
+        isDaughterOfServiceAllowed:
+          type: boolean
+          nullable: true
+          example: true
+        numDrivers:
+          type: integer
+          example: 4
+        numGuests:
+          type: integer
+        numKids:
+          type: integer
+          description: number of kids less from two years old
+        numShtilim:
+          type: integer
+          example: 10
+        noPayment:
+          type: integer
+          nullable: true
+          example: 1
+        tripStatus:
+          $ref: '#/components/schemas/Status'
+        marketer:
+          $ref: '#/components/schemas/Marketer'
+        reasonUnConfirm:
+          type: string
+          example: not checked
+        insideCenterFieldId:
+          type: integer
+          description: 1=Inside center, 2=Outside center
+          example: 0
+        isApprovalEmailSentToCustomer:
+          type: boolean
+          nullable: true
+          description: true if trip approval email sent to customer
+          example: false
+        addressCasualCustomer:
+          type: string
+          example: tel 18
+        cityCasualCustomer:
+          type: string
+          example: tel-aviv
+        zipCasualCustomer:
+          type: integer
+          format: int64
+          nullable: true
+          example: 9999
+        phoneCasualCustomer:
+          type: string
+          example: '88888'
+        nameCasualCustomer:
+          type: string
+          example: eyal
+        isSalKKlGroup:
+          type: integer
+          nullable: true
+          example: 4
+        collectiveGroupId:
+          type: integer
+          nullable: true
+        isOccupancyProblematic:
+          type: integer
+          nullable: true
+          example: 5
+        mainActivity:
+          $ref: '#/components/schemas/MainActivity'
+        isMaale323DmeyKdimaExist:
+          type: boolean
+          nullable: true
+        isMaale322Exist:
+          type: boolean
+          nullable: true
+        isMaale323Exist:
+          type: boolean
+          nullable: true
+        isDepositConfirmationFileExists:
+          type: boolean
+          default: false
+        isInternalHostingOrderExist:
+          type: boolean
+          nullable: true
+        isExternalHostingOrderExist:
+          type: boolean
+          nullable: true
+        stayFormStatus:
+          $ref: '#/components/schemas/SelectOption'
+        lastDateCanAssignDaughterOfService:
+          type: string
+          format: date-time
+          nullable: true
+        lodgingOrdersComments:
+          type: string
+          nullable: true
+          description: comments regarding lodging orders
+        facilityOrdersComments:
+          type: string
+          nullable: true
+          description: comments regarding facility orders
+        isCenterFieldQuantityApproval:
+          type: boolean
+          nullable: true
+          description: true if the center field quantity is approved by the center field employee
+        economyOrdersComments:
+          type: string
+          nullable: true
+          description: comments regarding economy orders
+        isGuestsExist:
+          type: boolean
+          nullable: false
+        guestsDate:
+          type: string
+          format: date-time
+          nullable: true
+        guestsStartTime:
+          type: string
+          format: time
+          nullable: true
+        guestsEndTime:
+          type: string
+          format: time
+          nullable: true
+        guestsComments:
+          type: string
+          nullable: true
+        marketerMobile:
+          type: string
+          nullable: true
+        marketerName:
+          type: string
+          nullable: true
+        instructionsForWalk:
+          type: string
+          nullable: true
+        comment:
+          type: string
+          nullable: true
+        isNeedReference:
+          type: boolean
+          nullable: true
+        downPaymentQnty:
+          type: number
+          nullable: true
+        numOfParticipantsNotPay:
+          type: integer
+        totalToPay:
+          type: number
+        subsidy:
+          type: number
+        totalCost:
+          type: number        
+    OrderEvent:
+      discriminator:
+        propertyName: orderEvent
+      type: object
+      properties:
+        order:
+          $ref: '#/components/schemas/Order'
+        globalParameters:
+          $ref: '#/components/schemas/OrderItemCommonDetails'        
+    
+    KKLWorker:
+      type: object
+      properties:
+        id:
+          type: integer
+        name:
+          type: string
+          description: first name and last name
+        phone:
+          type: string
+          example: '95869805'
+        email:
+          type: string
+          example: test@gmail.com
+          
+    Order:
+      type: object
+      properties:
+        tripId:
+          type: integer
+        orderId:
+          type: integer
+        status:
+          $ref: '#/components/schemas/Status'
+        orderType:
+          $ref: '#/components/schemas/OrderType'
+        supplier:
+          $ref: '#/components/schemas/Supplier'
+        billingSupplier:
+          $ref: '#/components/schemas/Supplier'
+        comment:
+          type: string
+        purchaseOrderAmount:
+          type: number
+          nullable: true
+        siteId:
+          type: integer
+          nullable: true
+        sentToSupplier:
+          type: string
+          format: date-time
+          nullable: true
+        sentBy:
+          type: string
+        voucherNum:
+          type: integer
+          nullable: true
+        cancelDate:
+          type: string
+          format: date-time
+          nullable: true
+        causeCancellation:
+          type: string
+        cancelBy:
+          type: string
+        paidToSupplier:
+          type: number
+          nullable: true
+        originalPaidToSupplier:
+          type: number
+          nullable: true
+        openDate:
+          type: string
+          format: date-time
+          nullable: true
+        finOrderType:
+          type: string
+        budgetItem:
+          type: integer
+          nullable: true
+        confirmDate:
+          type: string
+          format: date-time
+          nullable: true
+        confirmBy:
+          type: string
+        confirmUserTz:
+          type: integer
+          nullable: true
+        confirmByUser:
+          type: string
+        confirmCancelBy:
+          type: string
+        confirmCancelByUser:
+          type: string
+        confirmCancelDate:
+          type: string
+          format: date-time
+          nullable: true
+        confirmCancelUserTz:
+          type: integer
+          nullable: true
+        supplierProcedureNum:
+          type: string
+        totalPayCustomer:
+          type: number
+          nullable: true
+        totalPaySupplier:
+          type: number
+          nullable: true
+        totalPayAfterKklSubsidy:
+          type: number
+          nullable: true
+        userInfo:
+          type: string
+        isChangeSupplierRequested:
+          type: boolean
+          nullable: true
+        orderFinancialNumber:
+          type: integer
+        orderFinancialStatus:
+          $ref: '#/components/schemas/Status'
+        guidanceInstructions:
+          type: string
+          description: The guidance instructions for the trip
+          nullable: true
+        guideComments:
+          type: string
+          description: The comments of the guide for the trip
+          nullable: true
+        guidanceLanguage:
+          $ref: '#/components/schemas/Language'
+        isTransportationExecutionApproved:
+          type: boolean
+          nullable: true
+          description: is the transportation execution approved by the education department
+          
+    OrderType:
+      type: object
+      properties:
+        id:
+          type: integer
+        name:
+          type: string
+        iconPath:
+          type: string
+        finOrderType:
+          type: string      
+          
+    OrderItemCommonDetails:
+      type: object
+      properties:
+        itemId:
+          type: integer
+          description: the unique item id
+        orderId:
+          type: integer
+          nullable: true
+          description: refers to indentity record on order table in data base
+        itemIndexInOrder:
+          type: integer
+          nullable: true
+          description: Indicates the index number of the item in the order
+        orderItemDetails:
+          $ref: '#/components/schemas/ItemsByTypeOrder'
+        supplierId:
+          type: integer
+        quantity:
+          type: integer
+        itemCost:
+          type: number
+        billingSupplier:
+          type: number
+          nullable: true
+        billingCustomer:
+          type: number
+          nullable: true
+        participantsNumber:
+          type: integer
+          nullable: true
+        location:
+          type: string
+        startDate:
+          type: string
+          format: date-time
+        endDate:
+          type: string
+          format: date-time
+        startHour:
+          type: string
+          format: date-time
+        endHour:
+          type: string
+          format: date-time
+        comments:
+          type: string
+        internalComment:
+          type: string
+        openDate:
+          type: string
+          format: date-time
+        chasavApproval:
+          type: string
+        attributeManagerApproval:
+          type: string
+        userInfo:
+          type: string
+        isAddition:
+          type: boolean
+          default: false
+        requestedAmount:
+          type: integer
+          nullable: true
+        executionStatus:
+          $ref: '#/components/schemas/Status'      
+    ItemsByTypeOrder:
+      type: object
+      properties:
+        id:
+          type: integer
+        name:
+          type: string
+        cost:
+          type: number
+          nullable: true
+        type:
+          type: integer
+        costCustomer:
+          type: number
+          nullable: true
+        costSupplier:
+          type: number
+          nullable: true
+        numPeople:
+          type: integer
+        cosherType:
+          type: integer
+        credit:
+          type: integer
+          nullable: true
+        costVat:
+          type: number
+          nullable: true
+        isCustomerBilling:
+          type: integer
+          nullable: true
+        isNight:
+          type: integer
+          nullable: true
+        orderType:
+          type: integer
+          nullable: true
+        isSumPeopleOrAmount:
+          type: integer
+          nullable: true
+        weekPart:
+          type: string
+        typeSleepId:
+          type: integer
+          nullable: true
+        customerType:
+          type: string
+          nullable: true
+        supplierId:
+          type: integer
+          nullable: true
+        classroomTypeId:
+          type: integer
+          nullable: true
+        isSmallRange:
+          type: integer
+          nullable: true
+        amountLimit:
+          type: integer
+          nullable: true
+        participantsLimit:
+          type: integer
+          nullable: true
+        numSeat:
+          type: integer
+          nullable: true
+        isMore:
+          type: integer
+          nullable: true
+        listNamesClasses:
+          type: array
+          items:
+            type: string
+            nullable: true
+        numHoursNeeded:
+          type: number
+          nullable: true
+        isNeedManagerApproval:
+          type: boolean
+          nullable: true
+        faciilityTypeId:
+          type: integer
+          nullable: true
+          description: >-
+            Gives an indication of which facility code the item is associated
+            with      
+    Status:
+      type: object
+      properties:
+        id:
+          type: integer
+          example: 3
+        name:
+          type: string
+          example: active      
+          
+    Supplier:
+      discriminator:
+        propertyName: supplier
+      type: object
+      properties:
+        id:
+          type: integer
+        name:
+          type: string
+        finId:
+          type: number
+          nullable: true
+        businessNumber:
+          type: string
+        address:
+          type: string
+          default: לא זמין
+        supplierType:
+          type: integer
+          nullable: true
+        isValid:
+          type: boolean
+          nullable: true
+        phone:
+          type: string
+        email:
+          type: string
+        fax:
+          type: string
+        supplierStatus:
+          type: string
+          enum:
+            - reviewing
+            - approved
+        contactPhone:
+          type: string
+        contactName:
+          type: string
+        registrationNum:
+          type: string
+        supplierFinId:
+          type: integer
+        isGuideSupplier:
+          type: integer
+          nullable: true
+        supplierFinStatusCode:
+          type: integer
+          format: int16
+          nullable: true
+          example: 12
+        withMaam:
+          type: boolean
+        currencyCode:
+          type: integer
+        taxDeduction:
+          $ref: '#/components/schemas/Tax'
+        supplierProcedures:
+          type: array
+          items:
+            $ref: '#/components/schemas/Procedure'
+        occupationAreas:
+          type: array
+          items:
+            $ref: '#/components/schemas/Region'
+        country:
+          $ref: '#/components/schemas/CodeNameRecord'
+        city:
+          $ref: '#/components/schemas/CodeNameRecord'
+        contactPersons:
+          type: array
+          items:
+            $ref: '#/components/schemas/ContactPerson'
+        contactPersonsCount:
+          type: string
+        contractsCount:
+          type: string
+        ratingAndSanctionsTitle:
+          type: string
+    
+    ContactPerson:
+      type: object
+      properties:
+        contactPersonCode:
+          type: integer
+          description: Contact person code
+          format: int32
+          example: 1122
+        contactPersonName:
+          type: string
+          description: Contact person name
+          example: David Webb
+        primary:
+          type: boolean
+          description: >-
+            Is the contact person the primary one. each supplier can only have
+            one primary contact person
+          example: true
+        city:
+          $ref: '#/components/schemas/CodeNameRecord'
+        neighborhood:
+          type: string
+          nullable: true
+          description: Neighborhood
+          example: Florentin
+        street:
+          type: string
+          nullable: true
+          description: Street
+          example: Ha'masger
+        zip_code:
+          type: integer
+          nullable: true
+          description: Zip code
+          example: 1234567
+        phone:
+          type: string
+          nullable: true
+          description: Phone number.
+          example: '085555555'
+        cellphone:
+          type: string
+          nullable: true
+          description: Cellphone.
+          example: '0545454545'
+        fax:
+          type: string
+          nullable: true
+          description: Fax number.
+          example: '085555558'
+        email:
+          type: string
+          nullable: true
+          description: Email
+          example: david@example.com
+        jobDescription:
+          $ref: '#/components/schemas/SelectOption'
+        country:
+          $ref: '#/components/schemas/CodeNameRecord'
+        isDelete:
+          type: boolean
+          description: should we delete this contact person
+          example: true
+          writeOnly: true
+          
+    CodeNameRecord:
+      type: object
+      properties:
+        code:
+          type: integer
+          description: The code of the record
+          example: 10
+        name:
+          type: string
+          description: The name of the record
+          example: בקתה      
+    Region:
+      type: object
+      properties:
+        name:
+          type: string
+          nullable: true
+          example: נטיעת יער-הכנת שטח
+          readOnly: true
+        code:
+          type: string
+          description: main occupation area and sub occupation area are divided by ~
+          minLength: 4
+          maxLength: 6
+          pattern: ^[0-9]{1,2}~[0-9]{1,2}[A-Z]$
+          example: 25~25J
+        tenderCode:
+          type: string
+          nullable: true
+          description: Tender code
+          minLength: 2
+          maxLength: 20
+          example: 1225/17/מס
+        Delete:
+          type: boolean
+          description: should we delete this region
+          example: true
+          writeOnly: true
+          
+    Tax:
+      type: object
+      required:
+        - taxDeduction
+      properties:
+        taxDeduction:
+          type: string
+          description: >-
+            Supplier tax deduction type. If tax_deduction = no then
+            tax_deduction_percentage, tax_deduction_from_date and
+            tax_deduction_to_date are required. If tax_deduction != yes then
+            tax_deduction_percentage, tax_deduction_from_date,
+            tax_deduction_to_date, tax_deduction_file_number and
+            tax_deduction_group_code are required. If tax_deduction = yes then
+            nothing else from the list is required
+          enum:
+            - 'yes'
+            - 'no'
+            - gradual
+          example: 'yes'
+        taxOfficerCode:
+          type: integer
+          nullable: true
+          description: Tax officer code
+          format: int32
+          minimum: 1
+          maximum: 999999
+          example: 432543
+        taxDeductionPercentage:
+          type: number
+          nullable: true
+          format: float
+          description: Tax deduction percantage
+          minimum: 0
+          maximum: 49
+          example: 4.55
+        taxDeductionFromDate:
+          type: string
+          nullable: true
+          format: date
+          description: Tax deduction from date
+          example: '2022-06-01'
+        taxDeductionToDate:
+          type: string
+          nullable: true
+          format: date
+          description: Tax deduction to date
+          example: '2022-06-10'
+        taxDeductionFileNumber:
+          type: string
+          nullable: true
+          description: Tax deduction file number
+          minLength: 2
+          maxLength: 10
+          example: 223344
+        taxDeductionGroupCode:
+          type: integer
+          nullable: true
+          description: Tax deduction group code
+          format: int32
+          minimum: 1
+          maximum: 99  
+          
+    Procedure:
+      type: object
+      properties:
+        code:
+          type: string
+        number:
+          type: string
+        name:
+          type: string
+        project_activity:
+          type: integer
+          nullable: true
+          example: 14725
+        amount:
+          type: number
+          nullable: true
+          example: 201708
+        usedAmount:
+          type: number
+          nullable: true
+          example: 201708
+        remainingAmount:
+          type: number
+          nullable: true
+          example: 201708
+        demandNumber:
+          type: integer
+          nullable: true
+          example: 215000706
+        currencyCode:
+          type: integer
+          nullable: true
+          minimum: 1
+          maximum: 999999
+          example: 1
+        contractStartDate:
+          type: string
+          nullable: true
+          format: date
+          example: '2017-05-15'
+        contractEndDate:
+          type: string
+          nullable: true
+          format: date
+          example: '2020-05-15'
+        toolActivity:
+          type: integer
+          nullable: true
+          example: 20
+        procedureType:
+          type: string
+          default: לא זמין
+        procedureDepartment:
+          type: string
+          default: לא זמין
+        procedureScope:
+          type: string
+          default: לא זמין
+        budgetBalance:
+          type: string
+          default: לא זמין
+        suppliersCount:
+          type: integer      

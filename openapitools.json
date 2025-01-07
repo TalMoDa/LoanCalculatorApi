@@ -1,0 +1,38 @@
+{
+  "spaces": 2,
+  "generator-cli": {
+    "version": "6.4.0",
+    "generators": {
+      "angular": {
+        "generatorName": "typescript-angular",
+        "output": "#{cwd}/output/angular/open-api",
+        "glob": "education-orders-approval.yaml",
+        "additionalProperties": {
+          "supportsES6": true
+        }
+      },
+      "aspnetcore": {
+        "generatorName": "aspnetcore",
+        "output": "#{cwd}/output/aspnetcore",
+        "glob": "education-orders-approval.yaml",
+        "additionalProperties": {
+          "packageName": "EducationOrdersApprovalClient",
+          "packageTitle": "EducationOrdersApprovalClient",
+          "packageVersion": "1.6.0",
+          "aspnetCoreVersion": "5.0",
+          "buildTarget": "program",
+          "generateBody": true,
+          "newtonsoftVersion": "13.0.1",
+          "nullableReferenceTypes": true,
+          "operationIsAsync": true,
+          "operationResultTask": true,
+          "swashbuckleVersion": "5.0.0",
+          "useDefaultRouting": true,
+          "useFrameworkReference": true,
+          "useNewtonsoft": true,
+          "useSwashbuckle": true
+        }
+      }
+    }
+  }
+}
