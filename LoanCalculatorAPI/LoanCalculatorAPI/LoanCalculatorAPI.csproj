@@ -31,7 +31,7 @@
 
     <ItemGroup>
         <Folder Include="Data\Entities\"/>
-        <Folder Include="Strategies\" />
+        <Folder Include="Services\Loan\Calculations\" />
     </ItemGroup>
 
 </Project>

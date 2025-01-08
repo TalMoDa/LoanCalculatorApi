@@ -1,11 +1,11 @@
 ﻿using LoanCalculatorAPI.Common.Models.ResultPattern;
 using LoanCalculatorAPI.Data.Repositories.Interfaces;
-using LoanCalculatorAPI.Services.Loan.Customer.Interfaces;
-using LoanCalculatorAPI.Strategies.Calculation.Interfaces;
+using LoanCalculatorAPI.Services.Loan.Calculations.Interfaces;
+using LoanCalculatorAPI.Services.Loan.Client.Interfaces;
 
-namespace LoanCalculatorAPI.Services.Loan.Customer.Implementations;
+namespace LoanCalculatorAPI.Services.Loan.Client.Implementations;
 
-public class CustomerLoanService(ILoanCalculationStrategy loanCalculationStrategy, IClientRepository clientRepository) : ICustomerLoanService
+public class ClientLoanService(ILoanCalculationService loanCalculationService, IClientRepository clientRepository) : IClientLoanService
 {
     
     public async Task<Result<decimal>> CalculateLoanAsync(Guid customerId, decimal loanAmount, int loanPeriodInMonths, CancellationToken cancellationToken)
@@ -17,7 +17,7 @@ public class CustomerLoanService(ILoanCalculationStrategy loanCalculationStrateg
            return Error.NotFound($"Client with id {customerId} was not found");
         }
         
-        var loanValue = await loanCalculationStrategy.CalculateInterestByAgeStrategy(
+        var loanValue = await loanCalculationService.CalculateInterestAsync(
             loanAmount: loanAmount,
             loanPeriodInMonths: loanPeriodInMonths, 
             age: client.Age,

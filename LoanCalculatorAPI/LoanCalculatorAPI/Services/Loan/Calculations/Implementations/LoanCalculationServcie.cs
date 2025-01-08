@@ -1,16 +1,19 @@
 ﻿using LoanCalculatorAPI.Data.Entities.EF;
 using LoanCalculatorAPI.Data.Repositories.Interfaces;
 using LoanCalculatorAPI.Helpers.Calculate;
-using LoanCalculatorAPI.Strategies.Calculation.Interfaces;
+using LoanCalculatorAPI.Services.Loan.Calculations.Interfaces;
 
-namespace LoanCalculatorAPI.Strategies.Calculation.Implementations;
+namespace LoanCalculatorAPI.Services.Loan.Calculations.Implementations;
 
-public class LoanCalculationStrategy(ILoanAgeCalculationRepository loanAgeCalculationRepository, IPrimeInterestRepository primeInterestRepository) : ILoanCalculationStrategy
+public class LoanCalculationService(ILoanAgeCalculationRepository loanAgeCalculationRepository, IPrimeInterestRepository primeInterestRepository) : ILoanCalculationService
 {
-    public async Task<decimal> CalculateInterestByAgeStrategy(decimal loanAmount, int loanPeriodInMonths, int age, CancellationToken cancellationToken = default)
+
+    public async Task<decimal> CalculateInterestAsync(decimal loanAmount, int loanPeriodInMonths, int age, CancellationToken cancellationToken = default)
     {
+        // Get the loan age calculation entity
         var loanAgeCalculations = await loanAgeCalculationRepository.GetLoanAgeCalculationByAgeAndLoanAmount(age, loanAmount, cancellationToken);
         
+        // Validate the loan age calculation is present and single
         ValidateLoanAgeCalculations(loanAgeCalculations);
 
         var loanAgeCalculation = loanAgeCalculations.First();
@@ -30,7 +33,7 @@ public class LoanCalculationStrategy(ILoanAgeCalculationRepository loanAgeCalcul
         return loanAmount + baseInterest + primeInterest + extraMonthInterest;
     }
 
-
+    
 
     private async Task<decimal> GetPrimeInterestRateContribution(decimal loanAmount, CancellationToken cancellationToken)
     {

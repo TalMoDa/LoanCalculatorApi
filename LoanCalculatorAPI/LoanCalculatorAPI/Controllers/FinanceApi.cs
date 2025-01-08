@@ -21,7 +21,7 @@ namespace LoanCalculatorAPI.Controllers
     /// 
     /// </summary>
     [ApiController]
-    public class FinanceApiController(IMediator mediator) : AppBaseController
+    public sealed class FinanceApiController(IMediator mediator) : AppBaseController
     { 
         /// <summary>
         /// 
@@ -37,7 +37,7 @@ namespace LoanCalculatorAPI.Controllers
         [ValidateModelState]
         [SwaggerOperation("ValuateLoan")]
         [SwaggerResponse(statusCode: 200, type: typeof(decimal), description: "successful operation")]
-        public virtual async Task<IActionResult> ValuateLoan([FromQuery (Name = "loanAmount")][Required()]decimal loanAmount, [FromQuery (Name = "loanPeriodInMonths")][Required()]int loanPeriodInMonths, [FromQuery (Name = "clientId")]Guid? clientId, CancellationToken cancellationToken)
+        public async Task<IActionResult> ValuateLoan([FromQuery (Name = "loanAmount")][Required()]decimal loanAmount, [FromQuery (Name = "loanPeriodInMonths")][Required()]int loanPeriodInMonths, [FromQuery (Name = "clientId")]Guid? clientId, CancellationToken cancellationToken)
         {
             var query = new ValuateLoanQuery(
                 LoanAmount:loanAmount,

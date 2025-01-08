@@ -40,7 +40,7 @@ public class ValidationBehavior<TRequest, TResponse> :
                 validationFailure.ErrorMessage,
                 validationFailure.ErrorCode));
 
-        _httpContextAccessor.HttpContext.Items.Add("Errors", errors);
+        _httpContextAccessor.HttpContext?.Items.Add("Errors", errors);
 
         return (dynamic)errors;
     }

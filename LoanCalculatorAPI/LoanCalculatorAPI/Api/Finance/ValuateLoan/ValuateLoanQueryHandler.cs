@@ -1,10 +1,10 @@
 ﻿using LoanCalculatorAPI.Common.Models.ResultPattern;
-using LoanCalculatorAPI.Services.Loan.Customer.Interfaces;
+using LoanCalculatorAPI.Services.Loan.Client.Interfaces;
 using MediatR;
 
 namespace LoanCalculatorAPI.Api.Finance.ValuateLoan;
 
-public class ValuateLoanQueryHandler(ICustomerLoanService customerLoanService) : IRequestHandler<ValuateLoanQuery, Result<decimal>>
+public class ValuateLoanQueryHandler(IClientLoanService clientLoanService) : IRequestHandler<ValuateLoanQuery, Result<decimal>>
 {
     public async Task<Result<decimal>> Handle(ValuateLoanQuery request, CancellationToken cancellationToken)
     {
@@ -22,7 +22,7 @@ public class ValuateLoanQueryHandler(ICustomerLoanService customerLoanService) :
 
     private async Task<Result<decimal>> CalculateCustomerLoan(ValuateLoanQuery request, CancellationToken cancellationToken)
     {
-        return await customerLoanService.CalculateLoanAsync(
+        return await clientLoanService.CalculateLoanAsync(
             request.ClientId!.Value,
             request.LoanAmount,
             request.LoanPeriodInMonths,

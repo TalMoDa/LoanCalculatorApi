@@ -9,7 +9,6 @@ builder.Services.AddSettings();
 builder.Services.AddDbContext();
 builder.Services.AddAppMediatR();
 builder.Services.AddServices();
-builder.Services.AddStrategies();
 builder.Host.UseSerilog((context, configuration) => { configuration.ReadFrom.Configuration(context.Configuration); });
 builder.Services.UseProblemDetails();
 builder.Services.AddHttpContextAccessor();
@@ -19,6 +18,7 @@ builder.Services.AddSwaggerGen();
 
 var app = builder.Build();
 
+app.UseCors(x => { x.AllowAnyMethod().AllowAnyHeader().SetIsOriginAllowed(_ => true).AllowCredentials(); });
 app.ConfigureSerilogLogger();
 
 app.UseGlobalErrorHandling();
