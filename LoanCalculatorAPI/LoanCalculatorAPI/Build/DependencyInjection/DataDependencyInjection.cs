@@ -6,6 +6,7 @@ using LoanCalculatorAPI.Data;
 using LoanCalculatorAPI.Data.Repositories.Implementations;
 using LoanCalculatorAPI.Data.Repositories.Interfaces;
 using LoanCalculatorAPI.Settings;
+using Serilog;
 
 namespace LoanCalculatorAPI.Build.DependencyInjection;
 
@@ -16,7 +17,11 @@ public static class DataDependencyInjection
         var connectionString = services.BuildServiceProvider().GetRequiredService<IOptions<ConnectionStrings>>().Value
             .DefaultConnection;
         services.AddScoped<IDbConnection>(_ => new SqlConnection(connectionString));
-        services.AddDbContext<FinanceDbContext>(options => options.UseSqlServer(connectionString));
+        services.AddDbContext<FinanceDbContext>(options =>
+        {
+            options.UseSqlServer(connectionString);
+            options.LogTo(Log.Debug, [DbLoggerCategory.Database.Command.Name]);
+        });
         services.AddRepositories();
         return services;
     }
